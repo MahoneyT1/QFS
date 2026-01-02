@@ -3,6 +3,7 @@
 import { Shield, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import Button from '../UI/Button'
+import Link from 'next/link'
 
 
 export default function Navbar () {
@@ -22,18 +23,18 @@ export default function Navbar () {
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center gap-8">
-                        <a href="#features" className="text-gray-300 hover:text-white transition-colors">
+                        <Link href="/features" className="text-gray-300 hover:text-white transition-colors">
                             Features
-                        </a>
-                        <a href="#crypto" className="text-gray-300 hover:text-white transition-colors">
+                        </Link>
+                        <Link href="/crypto" className="text-gray-300 hover:text-white transition-colors">
                             Markets
-                        </a>
-                        <a href="#about" className="text-gray-300 hover:text-white transition-colors">
+                        </Link>
+                        <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
                             About
-                        </a>
-                        <a href="#contact" className="text-gray-300 hover:text-white transition-colors">
+                        </Link>
+                        <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
                             Contact
-                        </a>
+                        </Link>
                     </div>
 
                     {/* CTA Buttons */}
@@ -58,18 +59,19 @@ export default function Navbar () {
             {isOpen && (
                 <div className="md:hidden bg-slate-950 border-t border-slate-800">
                     <div className="px-4 py-4 space-y-4">
-                        <a href="#features" className="block text-gray-300 hover:text-white transition-colors">
+                        <Link href="/features" className="block text-gray-300 hover:text-white transition-colors">
                             Features
-                        </a>
-                        <a href="#crypto" className="block text-gray-300 hover:text-white transition-colors">
+                        </Link>
+                        <Link href="/cryphref" className="block text-gray-300 hover:text-white transition-colors">
                             Markets
-                        </a>
-                        <a href="#about" className="block text-gray-300 hover:text-white transition-colors">
+                        </Link>
+                        <Link href="/about" className="block text-gray-300 hover:text-white transition-colors">
                             About
-                        </a>
-                        <a href="#contact" className="block text-gray-300 hover:text-white transition-colors">
+                        </Link>
+                        <Link href="/contact" className="block text-gray-300 hover:text-white transition-colors">
                             Contact
-                        </a>
+                        </Link>
+
                         <div className="pt-4 border-t border-slate-800 space-y-2">
                             <Button name='Sign In' className="w-full text-gray-300 hover:text-white hover:bg-white/10">
                             </Button>
