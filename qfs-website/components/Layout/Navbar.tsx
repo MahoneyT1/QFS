@@ -26,7 +26,7 @@ export default function Navbar () {
                         <Link href="/features" className="text-gray-300 hover:text-white transition-colors">
                             Features
                         </Link>
-                        <Link href="/crypto" className="text-gray-300 hover:text-white transition-colors">
+                        <Link href="/market" className="text-gray-300 hover:text-white transition-colors">
                             Markets
                         </Link>
                         <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
@@ -35,6 +35,8 @@ export default function Navbar () {
                         <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
                             Contact
                         </Link>
+
+                       
                     </div>
 
                     {/* CTA Buttons */}
@@ -62,7 +64,7 @@ export default function Navbar () {
                         <Link href="/features" className="block text-gray-300 hover:text-white transition-colors">
                             Features
                         </Link>
-                        <Link href="/cryphref" className="block text-gray-300 hover:text-white transition-colors">
+                        <Link href="/market" className="block text-gray-300 hover:text-white transition-colors">
                             Markets
                         </Link>
                         <Link href="/about" className="block text-gray-300 hover:text-white transition-colors">
@@ -71,6 +73,7 @@ export default function Navbar () {
                         <Link href="/contact" className="block text-gray-300 hover:text-white transition-colors">
                             Contact
                         </Link>
+
 
                         <div className="pt-4 border-t border-slate-800 space-y-2">
                             <Button name='Sign In' className="w-full text-gray-300 hover:text-white hover:bg-white/10">
