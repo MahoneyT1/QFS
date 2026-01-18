@@ -1,13 +1,16 @@
 'use client'
 
+
 import { Shield, Menu, X } from 'lucide-react'
 import { useState } from 'react'
-import Button from '../UI/Button'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 
 export default function Navbar () {
     const [isOpen, setIsOpen] = useState(false)
+
+    const router = useRouter();
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-primary backdrop-blur-md border-b border-slate-800">
@@ -23,9 +26,7 @@ export default function Navbar () {
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center gap-8">
-                        <Link href="/features" className="text-gray-300 hover:text-white transition-colors">
-                            Features
-                        </Link>
+                        
                         <Link href="/market" className="text-gray-300 hover:text-white transition-colors">
                             Markets
                         </Link>
@@ -36,17 +37,31 @@ export default function Navbar () {
                             Contact
                         </Link>
 
+                        <Link href="/learn" className="text-gray-300 hover:text-white transition-colors">
+                            Learn
+                        </Link>
+
+                        <Link href="/connect" className="text-gray-300 hover:text-white transition-colors">
+                            Connect Wallect
+                        </Link>
+
                        
                     </div>
 
                     {/* CTA Buttons */}
                     <div className="hidden md:flex items-center gap-4 ">
-                        <button className="hover:text-white hover:bg-white/10 text-white h-10 rounded-md px-6">Sign In</button>
-                        <button className="bg-blue-600 hover:bg-blue-700 text-white h-10 rounded-md px-6">Get Started</button>
+                        <button 
+                            onClick={() => router.push('/login')}
+                            className="hover:text-white hover:bg-white/10 text-white h-10 rounded-md px-6">
+                            Sign in
+                        </button>
 
+                        <button 
+                            onClick={() => router.push('/createAccount')}
+                            className="bg-blue-600 hover:bg-blue-700 text-white h-10 rounded-md px-6">Get Started
+                        </button>
 
-                    {/* Mobile menu button */}
-                        </div>
+                    </div>
 
                     <button
                         onClick={() => setIsOpen(!isOpen)}
@@ -61,9 +76,7 @@ export default function Navbar () {
             {isOpen && (
                 <div className="md:hidden bg-slate-950 border-t border-slate-800">
                     <div className="px-4 py-4 space-y-4">
-                        <Link href="/features" className="block text-gray-300 hover:text-white transition-colors">
-                            Features
-                        </Link>
+                        
                         <Link href="/market" className="block text-gray-300 hover:text-white transition-colors">
                             Markets
                         </Link>
@@ -74,12 +87,24 @@ export default function Navbar () {
                             Contact
                         </Link>
 
+                        <Link href="/learn" className="block text-gray-300 hover:text-white transition-colors">
+                            Learn
+                        </Link>
+
+                        <Link href="/connect" className="block text-gray-300 hover:text-white transition-colors">
+                            Connect Wallect
+                        </Link>
+
 
                         <div className="pt-4 border-t border-slate-800 space-y-2">
-                            <Button name='Sign In' className="w-full text-gray-300 hover:text-white hover:bg-white/10">
-                            </Button>
-                            <Button name='Get Started' className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                            </Button>
+                            <Link href='/auth/login'  className="w-full text-gray-300 hover:text-white hover:bg-white/10">
+                                Sign in
+                            </Link>
+
+                            <Link href='/auth/createAccount' className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                                Get Started
+                            </Link>
+                            
                         </div>
                     </div>
                 </div>
