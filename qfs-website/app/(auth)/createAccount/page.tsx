@@ -3,121 +3,68 @@
 
 import { motion } from "motion/react";
 import { Shield, Mail, Lock, User, Phone, Eye, EyeOff, Check, AlertCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { registerUser, signInWithGoogle, getPasswordStrength } from "@/utils/services";
+import { useForm } from "react-hook-form";
+import { auth, googleProvider } from "@/utils/firebase";
+import Link from 'next/link'
+
+
+type CreateAccountFormData = {
+    fullName: string;
+    email: string;
+    phoneNumber: string;
+    username?: string;
+    password: string;
+    confirmPassword: string;
+};
 
 
 export default function CreateAccount() {
-    const [formData, setFormData] = useState({
-        fullName: "",
-        email: "",
-        phone: "",
-        password: "",
-        confirmPassword: ""
-    });
+
+    const { 
+        register, handleSubmit, watch, reset,
+        formState: { errors, isSubmitting } } = useForm<CreateAccountFormData>({});
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [errors, setErrors] = useState<Record<string, string>>({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [accountCreated, setAccountCreated] = useState(false);
 
-    const validateForm = () => {
-        const newErrors: Record<string, string> = {};
+    const password = watch("password");
 
-        // Full Name validation
-        if (!formData.fullName.trim()) {
-            newErrors.fullName = "Full name is required";
-        } else if (formData.fullName.trim().length < 2) {
-            newErrors.fullName = "Full name must be at least 2 characters";
-        }
+    const confirmedPassword = useMemo(() => getPasswordStrength(password), [password]);
 
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!formData.email) {
-            newErrors.email = "Email is required";
-        } else if (!emailRegex.test(formData.email)) {
-            newErrors.email = "Please enter a valid email address";
-        }
+    const handleFormSubmit = async (data: CreateAccountFormData) => {
 
-        // Phone validation
-        const phoneRegex = /^\+?[\d\s\-()]{10,}$/;
-        if (!formData.phone) {
-            newErrors.phone = "Phone number is required";
-        } else if (!phoneRegex.test(formData.phone)) {
-            newErrors.phone = "Please enter a valid phone number";
-        }
-
-        // Password validation
-        if (!formData.password) {
-            newErrors.password = "Password is required";
-        } else if (formData.password.length < 8) {
-            newErrors.password = "Password must be at least 8 characters";
-        } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-            newErrors.password = "Password must contain uppercase, lowercase, and number";
-        }
-
-        // Confirm Password validation
-        if (!formData.confirmPassword) {
-            newErrors.confirmPassword = "Please confirm your password";
-        } else if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = "Passwords do not match";
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!validateForm()) {
-            return;
-        }
-
-        setIsSubmitting(true);
-
-        // Simulate API call
-        setTimeout(() => {
-            setIsSubmitting(false);
+        try {
+            await registerUser(
+                data.email,
+                data.password,
+                data.fullName,
+                data.phoneNumber,
+                data?.username || ""
+            );
             setAccountCreated(true);
-        }, 2000);
+        } catch (error) {
+            console.error("Registration failed:", error);
+        }
     };
 
-    const handleGoogleSignup = () => {
-        // Simulate Google OAuth
-        console.log("Google signup clicked");
-        alert("Google Sign-Up would redirect to Google OAuth here");
+    const handleGoogleSignup = async (auth: any, googleProvider: any) => {
+        const result = await signInWithGoogle(auth, googleProvider);
+
+        if (result) {
+            setAccountCreated(true);
+        }
+
     };
 
     const handleInputChange = (field: string, value: string) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-        // Clear error when user starts typing
-        if (errors[field]) {
-            setErrors(prev => {
-                const newErrors = { ...prev };
-                delete newErrors[field];
-                return newErrors;
-            });
-        }
+       
     };
 
-    const getPasswordStrength = () => {
-        const password = formData.password;
-        if (!password) return { strength: 0, label: "", color: "" };
 
-        let strength = 0;
-        if (password.length >= 8) strength++;
-        if (password.length >= 12) strength++;
-        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-        if (/\d/.test(password)) strength++;
-        if (/[^a-zA-Z0-9]/.test(password)) strength++;
 
-        if (strength <= 2) return { strength, label: "Weak", color: "bg-red-500" };
-        if (strength <= 3) return { strength, label: "Medium", color: "bg-yellow-500" };
-        return { strength, label: "Strong", color: "bg-green-500" };
-    };
-
-    const passwordStrength = getPasswordStrength();
 
     if (accountCreated) {
         return (
@@ -135,17 +82,17 @@ export default function CreateAccount() {
                     <p className="text-gray-300 mb-8">
                         Welcome to QFS! Your account has been created and you can now access all quantum-secured features.
                     </p>
-                    <div className="space-y-4">
-                        <button className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3">
+                    <div className="space-y-8">
+                        <Link className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3" href="/dashboard">
                             Go to Dashboard
-                        </button>
-                        <button
-                            
+                        </Link>
+                        <Link
+                            href="/createAccount"
                             className="w-full text-gray-300 hover:text-white hover:bg-white/10"
                             onClick={() => setAccountCreated(false)}
                         >
                             Create Another Account
-                        </button>
+                        </Link>
                     </div>
                 </motion.div>
             </div>
@@ -204,7 +151,7 @@ export default function CreateAccount() {
                     <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8">
                         {/* Google Sign Up */}
                         <button
-                            onClick={handleGoogleSignup}
+                            onClick={() => handleGoogleSignup(auth, googleProvider)}
                             className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-white hover:bg-gray-100 text-gray-900 font-medium rounded-xl transition-all mb-6"
                         >
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -239,7 +186,7 @@ export default function CreateAccount() {
                         </div>
 
                         {/* Sign Up Form */}
-                        <form onSubmit={handleSubmit} className="space-y-5">
+                        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
                             {/* Full Name */}
                             <div>
                                 <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-2">
@@ -252,8 +199,8 @@ export default function CreateAccount() {
                                     <input
                                         id="fullName"
                                         type="text"
-                                        value={formData.fullName}
-                                        onChange={(e) => handleInputChange("fullName", e.target.value)}
+                                        {...register("fullName", 
+                                            { required: "Full name is required" })}
                                         className={`w-full pl-10 pr-4 py-3 bg-slate-800 border ${errors.fullName ? "border-red-500" : "border-slate-600"
                                             } rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors`}
                                         placeholder="John Doe"
@@ -262,7 +209,7 @@ export default function CreateAccount() {
                                 {errors.fullName && (
                                     <p className="mt-1 text-sm text-red-400 flex items-center gap-1">
                                         <AlertCircle className="h-4 w-4" />
-                                        {errors.fullName}
+                                        {errors.fullName.message}
                                     </p>
                                 )}
                             </div>
@@ -279,8 +226,7 @@ export default function CreateAccount() {
                                     <input
                                         id="email"
                                         type="email"
-                                        value={formData.email}
-                                        onChange={(e) => handleInputChange("email", e.target.value)}
+                                        {...register("email", { required: "Email is required" })}
                                         className={`w-full pl-10 pr-4 py-3 bg-slate-800 border ${errors.email ? "border-red-500" : "border-slate-600"
                                             } rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors`}
                                         placeholder="john@example.com"
@@ -289,7 +235,7 @@ export default function CreateAccount() {
                                 {errors.email && (
                                     <p className="mt-1 text-sm text-red-400 flex items-center gap-1">
                                         <AlertCircle className="h-4 w-4" />
-                                        {errors.email}
+                                        {errors.email.message}
                                     </p>
                                 )}
                             </div>
@@ -306,17 +252,16 @@ export default function CreateAccount() {
                                     <input
                                         id="phone"
                                         type="tel"
-                                        value={formData.phone}
-                                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                                        className={`w-full pl-10 pr-4 py-3 bg-slate-800 border ${errors.phone ? "border-red-500" : "border-slate-600"
+                                        {...register("phoneNumber", { required: "Phone number is required" })}
+                                        className={`w-full pl-10 pr-4 py-3 bg-slate-800 border ${errors.phoneNumber ? "border-red-500" : "border-slate-600"
                                             } rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors`}
                                         placeholder="+1 (555) 123-4567"
                                     />
                                 </div>
-                                {errors.phone && (
+                                {errors.phoneNumber && (
                                     <p className="mt-1 text-sm text-red-400 flex items-center gap-1">
                                         <AlertCircle className="h-4 w-4" />
-                                        {errors.phone}
+                                        {errors.phoneNumber.message   }
                                     </p>
                                 )}
                             </div>
@@ -333,8 +278,19 @@ export default function CreateAccount() {
                                     <input
                                         id="password"
                                         type={showPassword ? "text" : "password"}
-                                        value={formData.password}
-                                        onChange={(e) => handleInputChange("password", e.target.value)}
+                                        {...register("password", 
+                                            { 
+                                                required: "Password is required",
+                                                minLength: { value: 8, 
+                                                            message: "Password must be at least 8 characters long" 
+                                                        },
+                                                pattern: {
+                                                    value: /^(?=.*[A-Z])(?=.*\d).+$/,
+                                                    message: "Password must contain at least one uppercase letter and one number"
+                                                }
+                                            }
+                                            
+                                        )}
                                         className={`w-full pl-10 pr-12 py-3 bg-slate-800 border ${errors.password ? "border-red-500" : "border-slate-600"
                                             } rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors`}
                                         placeholder="••••••••"
@@ -351,21 +307,22 @@ export default function CreateAccount() {
                                         )}
                                     </button>
                                 </div>
-                                {formData.password && (
+                                {confirmedPassword && (
                                     <div className="mt-2">
                                         <div className="flex items-center justify-between mb-1">
                                             <span className="text-xs text-gray-400">Password strength:</span>
-                                            <span className={`text-xs font-medium ${passwordStrength.label === "Weak" ? "text-red-400" :
-                                                    passwordStrength.label === "Medium" ? "text-yellow-400" :
-                                                        "text-green-400"
+                                            <span className={`text-xs font-medium ${confirmedPassword.strength === 1 ? confirmedPassword.color : "bg-red-500",
+                                                    confirmedPassword.strength  === 2 ? confirmedPassword.color : "text-orange-400",
+                                                    confirmedPassword.strength  === 3 ? confirmedPassword.color : "text-yellow-400",
+                                                    confirmedPassword.strength  === 4 ? "text-green-400" : ""
                                                 }`}>
-                                                {passwordStrength.label}
+                                                {confirmedPassword.label}
                                             </span>
                                         </div>
                                         <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                                             <div
-                                                className={`h-full ${passwordStrength.color} transition-all`}
-                                                style={{ width: `${(passwordStrength.strength / 5) * 100}%` }}
+                                                className={`h-full ${confirmedPassword.color} transition-all`}
+                                                style={{ width: `${(confirmedPassword.strength / 5) * 100}%` }}
                                             />
                                         </div>
                                     </div>
@@ -373,7 +330,7 @@ export default function CreateAccount() {
                                 {errors.password && (
                                     <p className="mt-1 text-sm text-red-400 flex items-center gap-1">
                                         <AlertCircle className="h-4 w-4" />
-                                        {errors.password}
+                                        {errors.password.message}
                                     </p>
                                 )}
                             </div>
@@ -390,8 +347,10 @@ export default function CreateAccount() {
                                     <input
                                         id="confirmPassword"
                                         type={showConfirmPassword ? "text" : "password"}
-                                        value={formData.confirmPassword}
-                                        onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                                            {...register("confirmPassword", {
+                                                required: "Please confirm your password",
+                                                validate: (value) => value === password || "Passwords do not match"
+                                            })}
                                         className={`w-full pl-10 pr-12 py-3 bg-slate-800 border ${errors.confirmPassword ? "border-red-500" : "border-slate-600"
                                             } rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors`}
                                         placeholder="••••••••"
@@ -411,7 +370,7 @@ export default function CreateAccount() {
                                 {errors.confirmPassword && (
                                     <p className="mt-1 text-sm text-red-400 flex items-center gap-1">
                                         <AlertCircle className="h-4 w-4" />
-                                        {errors.confirmPassword}
+                                        {errors.confirmPassword.message}
                                     </p>
                                 )}
                             </div>
@@ -457,9 +416,9 @@ export default function CreateAccount() {
                         <div className="mt-6 text-center">
                             <p className="text-gray-400">
                                 Already have an account?{" "}
-                                <a href="#" className="text-blue-400 hover:text-blue-300 font-medium">
+                                <Link href="/createAccount" className="text-blue-400 hover:text-blue-300 font-medium">
                                     Sign In
-                                </a>
+                                </Link>
                             </p>
                         </div>
                     </div>

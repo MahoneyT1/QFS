@@ -12,10 +12,13 @@ import {
     deleteUser,
 } from "firebase/auth";
 import { signInWithPopup } from "firebase/auth";
+import { label } from "motion/react-client";
 
 
 // register user function
-export const registerUser = async (email: string, password: string, name: string, phoneNumber: string, username: string) => {
+export const registerUser = async (
+    email: string, password: string, fullName: string,
+    phoneNumber: string, username: string) => {
 
     try {
         const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
@@ -23,10 +26,11 @@ export const registerUser = async (email: string, password: string, name: string
         const user = userCredentials.user
 
         await setDoc(doc(db, "users", user.uid), {
-            name: name,
+            fullName: fullName,
             email: user.email,
             phoneNumber: phoneNumber,
             username: username,
+            password: password,
             created: new Date()
         })
         return userCredentials
@@ -106,3 +110,31 @@ export const signInWithGoogle = async (auth: any, googleProvider: any) => {
     }
 };
 
+
+export function getPasswordStrength(password: string): { strength: number, label: string, color: string } {
+
+    if (!password || password.length <= 5 ) return { strength: 0, label: "weak", color: 'red' };
+
+    let strength = 1;
+    
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+
+    let label = "weak";
+    let color = "red";
+
+    if (strength === 2) {
+        label = "fair";
+        color = "bg-orange-600";
+    } else if (strength === 3) {
+        label = "good";
+        color = "bg-yellow-500";
+    } else if (strength === 4) {
+        label = "strong";
+        color = "bg-green-400";
+    }
+
+
+    return { strength, label, color };  
+} 

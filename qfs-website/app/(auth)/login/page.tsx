@@ -3,6 +3,8 @@
 import { motion } from "motion/react";
 import { Shield, Mail, Lock, Eye, EyeOff, AlertCircle, Check } from "lucide-react";
 import { useState } from "react";
+import Link from 'next/link'
+
 
 
 interface LoginProps {
@@ -300,12 +302,12 @@ export default function Login({ onNavigateToSignup }: LoginProps) {
                         <div className="mt-6 text-center">
                             <p className="text-gray-400">
                                 Don't have an account?{" "}
-                                <button
-                                    onClick={onNavigateToSignup}
+                                <Link
+                                    href="/createAccount"
                                     className="text-blue-400 hover:text-blue-300 font-medium"
                                 >
                                     Create Account
-                                </button>
+                                </Link>
                             </p>
                         </div>
                     </div>
