@@ -2,15 +2,21 @@
 
 
 import { Shield, Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { auth } from '@/utils/firebase'
 
 
 export default function Navbar () {
     const [isOpen, setIsOpen] = useState(false)
+    const [isAuthenticated, setIsAuthenticated] = useState(false)
 
     const router = useRouter();
+
+    useEffect(() => {
+        setIsAuthenticated(!!auth?.currentUser);
+    }, [auth?.currentUser]);
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-primary backdrop-blur-md border-b border-slate-800">
@@ -97,10 +103,15 @@ export default function Navbar () {
 
 
                         <div className="pt-4 border-t border-slate-800 space-y-2">
-                            <Link href='/auth/login'  className="w-full text-gray-300 hover:text-white hover:bg-white/10">
-                                Sign in
-                            </Link>
-
+                            { isAuthenticated ? (
+                                <Link href='/auth/logout' className="w-full text-gray-300 hover:text-white hover:bg-white/10">
+                                    Sign out
+                                </Link>
+                            ) : (
+                                <Link href='/auth/login' className="w-full text-gray-300 hover:text-white hover:bg-white/10">
+                                    Sign in
+                                </Link>
+                            )}
                             <Link href='/auth/createAccount' className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                                 Get Started
                             </Link>

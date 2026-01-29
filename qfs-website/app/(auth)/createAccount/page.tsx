@@ -4,10 +4,11 @@
 import { motion } from "motion/react";
 import { Shield, Mail, Lock, User, Phone, Eye, EyeOff, Check, AlertCircle } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
-import { registerUser, signInWithGoogle, getPasswordStrength } from "@/utils/services";
+import { registerUser, signInWithGoogle, getPasswordStrength, registerGoogleSignInUser } from "@/utils/services";
 import { useForm } from "react-hook-form";
 import { auth, googleProvider } from "@/utils/firebase";
-import Link from 'next/link'
+import Link from "next/link"
+import { toast } from "sonner";
 
 
 type CreateAccountFormData = {
@@ -46,7 +47,7 @@ export default function CreateAccount() {
             );
             setAccountCreated(true);
         } catch (error) {
-            console.error("Registration failed:", error);
+            toast.error("Registration failed. Please try again.");
         }
     };
 
@@ -54,17 +55,11 @@ export default function CreateAccount() {
         const result = await signInWithGoogle(auth, googleProvider);
 
         if (result) {
+            await registerGoogleSignInUser(result);
             setAccountCreated(true);
         }
 
     };
-
-    const handleInputChange = (field: string, value: string) => {
-       
-    };
-
-
-
 
     if (accountCreated) {
         return (
@@ -82,9 +77,9 @@ export default function CreateAccount() {
                     <p className="text-gray-300 mb-8">
                         Welcome to QFS! Your account has been created and you can now access all quantum-secured features.
                     </p>
-                    <div className="space-y-8">
-                        <Link className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3" href="/dashboard">
-                            Go to Dashboard
+                    <div className="flex gap-5 items-center justify-center">
+                        <Link className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3" href="/">
+                            Go to Home
                         </Link>
                         <Link
                             href="/createAccount"

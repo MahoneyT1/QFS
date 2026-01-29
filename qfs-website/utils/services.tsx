@@ -13,6 +13,7 @@ import {
 } from "firebase/auth";
 import { signInWithPopup } from "firebase/auth";
 import { label } from "motion/react-client";
+import { AppUser } from "@/types/user";
 
 
 // register user function
@@ -38,6 +39,35 @@ export const registerUser = async (
         throw new Error(String(err));
     }
 };
+
+
+export const registerGoogleSignInUser = async (result: any)=> {
+
+    const user = result?.user
+
+    if (!user) {
+        throw new Error("No user information found from Google sign-in.");
+    }
+
+    try {
+
+        const userData: AppUser = {
+            uid: user.uid,
+            email: user.email || "",
+            fullName: user.displayName || "",
+            photoURL: user.photoURL || undefined,
+            provider: "google",
+            hasPassword: false,
+            role: "user",
+            createdAt: serverTimestamp() as any,
+        }
+
+        await setDoc(doc(db, "users", user?.uid), userData);
+        return userData;
+    } catch (err) {
+        throw new Error(String(err));
+    }
+}
 
 // login user function
 export const loginUser = async (email: string, password: string) => {
