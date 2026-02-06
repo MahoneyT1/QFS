@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { auth } from '@/utils/firebase'
+import { logoutUser } from '@/utils/services'
 
 
 export default function Navbar () {
@@ -17,6 +18,8 @@ export default function Navbar () {
     useEffect(() => {
         setIsAuthenticated(!!auth?.currentUser);
     }, [auth?.currentUser]);
+
+    console.log(isAuthenticated);
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-primary backdrop-blur-md border-b border-slate-800">
@@ -56,11 +59,17 @@ export default function Navbar () {
 
                     {/* CTA Buttons */}
                     <div className="hidden md:flex items-center gap-4 ">
-                        <button 
-                            onClick={() => router.push('/login')}
-                            className="hover:text-white hover:bg-white/10 text-white h-10 rounded-md px-6">
-                            Sign in
-                        </button>
+                        
+                            {isAuthenticated ? (
+                                <button onClick={() => logoutUser()}>
+                                    Sign out
+                                </button>
+                            ) : (
+                                <Link href='/login' className="text-white hover:text-gray-200">
+                                    Sign in
+                                </Link>
+                             )}
+                       
 
                         <button 
                             onClick={() => router.push('/createAccount')}
@@ -104,14 +113,16 @@ export default function Navbar () {
 
                         <div className="pt-4 border-t border-slate-800 space-y-2">
                             { isAuthenticated ? (
-                                <Link href='/auth/logout' className="w-full text-gray-300 hover:text-white hover:bg-white/10">
+                                <button 
+                                    onClick={()=> logoutUser()}
+                                    className="w-full text-gray-300 hover:text-white hover:bg-white/10">
                                     Sign out
-                                </Link>
+                                </button> 
                             ) : (
-                                <Link href='/auth/login' className="w-full text-gray-300 hover:text-white hover:bg-white/10">
+                                <Link href='/login' className="w-full text-gray-300 hover:text-white hover:bg-white/10">
                                     Sign in
                                 </Link>
-                            )}
+                            )} 
                             <Link href='/auth/createAccount' className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                                 Get Started
                             </Link>

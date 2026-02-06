@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { Shield, Mail, Lock, Eye, EyeOff, AlertCircle, Check } from "lucide-react";
 import { useState } from "react";
 import Link from 'next/link'
+import { registerUser, signInWithGoogle, getPasswordStrength, registerGoogleSignInUser } from "@/utils/services";
 
 
 
@@ -59,10 +60,16 @@ export default function Login({ onNavigateToSignup }: LoginProps) {
         }, 2000);
     };
 
-    const handleGoogleSignin = () => {
-        // Simulate Google OAuth
-        console.log("Google signin clicked");
-        alert("Google Sign-In would redirect to Google OAuth here");
+    const handleGoogleSignin = (auth: any, googleProvider: any) => {
+            
+        const result = await signInWithGoogle(auth, googleProvider);
+
+        if (result) {
+            await registerGoogleSignInUser(result);
+            setAccountCreated(true);
+        }
+        
+            };
     };
 
     const handleInputChange = (field: string, value: string) => {
